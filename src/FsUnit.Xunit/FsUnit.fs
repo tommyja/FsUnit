@@ -24,7 +24,10 @@ let inline should (f : 'a -> ^b) x (y : obj) =
         match y with
         | :? (unit -> unit) as assertFunc -> box assertFunc
         | _ -> y
-    Assert.That(y, c)
+    if box c = null then
+        Assert.That(y, IsNull())
+    else
+        Assert.That(y, c)
 
 let inline shouldFail (f:unit->unit) =
     let failed =
@@ -98,8 +101,3 @@ let choice = CustomMatchers.choice
 let ascending = CustomMatchers.ascending
 
 let descending = CustomMatchers.descending
-
-module FsUnitDeprecated =
-    let not x = not' x
-
-// haveLength, haveCount, Empty, and shouldFail are not implemented for MbUnit and xUnit

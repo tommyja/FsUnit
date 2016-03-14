@@ -10,6 +10,7 @@ open Fake
 open Fake.Git
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
+open Fake.Testing
 open System
 open System.IO
 #if MONO
@@ -126,11 +127,10 @@ Target "Build" (fun _ ->
 
 Target "NUnit" (fun _ ->
     !! "tests/**/bin/Release/*NUnit.Test.dll"
-    |> NUnit (fun p ->
+    |> NUnit3 (fun p ->
         { p with
-            DisableShadowCopy = true
-            TimeOut = TimeSpan.FromMinutes 20.
-            OutputFile = "NUnit.xml" })
+            Labels = LabelsLevel.All
+            TimeOut = TimeSpan.FromMinutes 20.})
 )
 
 Target "xUnit" (fun _ ->
@@ -338,16 +338,17 @@ Target "All" DoNothing
   ==> "Build"
   ==> "CopyBinaries"
   ==> "RunTests"
+  ==> "All"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
-  ==> "All"
   =?> ("ReleaseDocs",isLocalBuild)
 
 "Build" ==> "NUnit"  ==> "RunTests"
 //XUnit2 console test runner does not work on Mono https://github.com/xunit/xunit/issues/158
-"Build" =?> ("xUnit", not isMono)  ==> "RunTests"
+"Build" ==> "xUnit"  ==> "RunTests"
 "Build" ==> "MbUnit" //==> "RunTests"
-"Build" =?> ("MsTest",isLocalBuild) //==> "RunTests"
+// MSTest is not supported on mono platform
+"Build" =?> ("MsTest", not isMono) ==> "RunTests"
 
 "All"
 #if MONO

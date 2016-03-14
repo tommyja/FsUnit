@@ -1,15 +1,15 @@
 source https://nuget.org/api/v2
 
 nuget FSharp.Formatting
-nuget NUnit 2.6.4
-nuget NUnit.Runners 2.6.4
+nuget NUnit
+nuget NUnit.Console
 nuget FAKE
 nuget SourceLink.Fake
 
 nuget FSharp.Core 3.1.2.5
 nuget Microsoft.VisualStudio.QualityTools.UnitTestFramework
 
-nuget NHamcrest 1.2.1
+nuget NHamcrest
 nuget xunit
 nuget xunit.runner.console
 nuget xunit.runner.visualstudio

@@ -96,8 +96,10 @@ false |> should not' (be True)
 
 null |> should be NullOrEmptyString
 null |> should be Null
+null |> should be null
 
 anObj |> should not' (be Null)
+anObj |> should not' (be null)
 anObj |> should be (sameAs anObj)
 anObj |> should not' (be sameAs otherObj)
 
@@ -132,13 +134,6 @@ Choice<int, string>.Choice1Of2(42) |> should be (choice 1)
 
 (**
 
-Deprecated Functions
---------------------
-
-Prior to version 1.1.0.0, FsUnit implemented a function named `not` that overwrote the F# operator of the same name. This is not ideal,
-so as of version 1.1.0.0 the FsUnit function has been renamed to `not'` (not + single-quote). If you need or want the previous function, it
-can be made available by opening the FsUnitDeprecated module.
-
 Visual Studio 11 Support
 ------------------------
 
@@ -149,6 +144,22 @@ Build the project and then run the command "Add-BindingRedirect projectname" (wh
 Package Manager Console. This command will update the `App.config` to include binding redirects from previous version of `FSharp.Core` to
 FSharp.Core version 4.3.0.0. More information about this command can be found in the [NuGet documentation](http://docs.nuget.org/docs/reference/package-manager-console-powershell-reference).
 
+Test Projects Targeting Higher F# Runtimes
+------------------------------------------
+
+If you build your test project with a target F# runtime greater than the targeted runtime of the FsUnit assembly, you may find FsUnit operators failing at runtime, in which case you need to add a binding redirect to the App.config file.
+
+    <?xml version="1.0" encoding="utf-8" ?>
+    <configuration>
+      <runtime>
+        <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+          <dependentAssembly>
+            <assemblyIdentity name="FSharp.Core" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-999.999.999.999" newVersion="4.4.0.0" />
+          </dependentAssembly>
+        </assemblyBinding>
+      </runtime>
+    </configuration>
 
 Contributing
 ------------

@@ -2,41 +2,26 @@
 
 namespace FsUnit
 
-open System
+open System.Diagnostics
 open NUnit.Framework
 open NUnit.Framework.Constraints
-
-type ChoiceConstraint(n) =
-  inherit Constraint() with
-    override this.WriteDescriptionTo(writer: MessageWriter): unit =
-      writer.WritePredicate("is choice")
-      writer.WriteExpectedValue(sprintf "%d" n)
-    override this.Matches(actual: obj) =
-      match actual with
-        | null -> raise (new ArgumentException("The actual value must be a non-null choice"))
-        | o -> (new CustomMatchers.ChoiceDiscriminator(n)).check(o)
-
-/// F#-friendly formatting for otherwise the same equals behavior (%A instead of .ToString())
-type EqualsConstraint(x:obj) =
-  inherit EqualConstraint(x) with
-    override this.WriteActualValueTo(writer: MessageWriter): unit =
-      writer.WriteActualValue(sprintf "%A" this.actual)
-    override this.WriteDescriptionTo(writer: MessageWriter): unit =
-      writer.WritePredicate("equals")
-      writer.WriteExpectedValue(sprintf "%A" x)
-    override this.WriteMessageTo(writer: MessageWriter): unit =
-      writer.WriteMessageLine(sprintf "Expected: %A, but was %A" x this.actual)
 
 //
 [<AutoOpen>]
 module TopLevelOperators =
+
+    [<SetUpFixture>]
+    type FSharpCustomMessageFormatter() =
+      do TestContext.AddFormatter(
+           ValueFormatterFactory(fun _ -> ValueFormatter(sprintf "%A")))
+
     let Null = NullConstraint()
 
     let Empty = EmptyConstraint()
 
     let EmptyString = EmptyStringConstraint()
 
-    let NullOrEmptyString = NullOrEmptyStringConstraint()
+    let NullOrEmptyString = OrConstraint(NullConstraint(), EmptyConstraint())
 
     let True = TrueConstraint()
 
@@ -46,15 +31,19 @@ module TopLevelOperators =
 
     let unique = UniqueItemsConstraint()
 
+    [<DebuggerNonUserCode>]
     let should (f : 'a -> #Constraint) x (y : obj) =
         let c = f x
         let y =
             match y with
             | :? (unit -> unit) -> box (TestDelegate(y :?> unit -> unit))
             | _ -> y
-        Assert.That(y, c)
+        if box c = null then
+            Assert.That(y, Is.Null)
+        else
+            Assert.That(y, c)
 
-    let equal x = EqualsConstraint(x)
+    let equal x = EqualConstraint(x)
 
     let equalWithin tolerance x = equal(x).Within tolerance
 
@@ -93,15 +82,9 @@ module TopLevelOperators =
 
     let instanceOfType<'a> = InstanceOfTypeConstraint(typeof<'a>)
 
-    let choice n = ChoiceConstraint(n)
-
     let ascending = Is.Ordered
 
     let descending = Is.Ordered.Descending
 
-    let not' x = NotConstraint(x)
-
-    /// Deprecated operators. These will be removed in a future version of FsUnit.
-    module FsUnitDeprecated =
-        [<System.Obsolete>]
-        let not x = not' x
+    let not' x =
+        if box x = null then NotConstraint(Null) else NotConstraint(x)

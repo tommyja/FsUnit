@@ -1,5 +1,22 @@
-### 1.4.0.0-beta4 - Unreleased
-* Migration to xUnit 2.0
+### 2.2.0-beta1 - March 7, 2016
+* Added FsUnitTyped with statically typed operators - https://github.com/fsprojects/FsUnit/pull/85
+* Fixed: Structural equality fail - https://github.com/fsprojects/FsUnit/issues/78
+* Fixed: Statically typed equality test - https://github.com/fsprojects/FsUnit/issues/21
+* Fixed: Simplify "should throw" - https://github.com/fsprojects/FsUnit/issues/20
+
+### 2.1.0 - March 7, 2016
+* Added support of `NUnit 3.2`
+* Added pretty-print for F# value types - https://github.com/fsprojects/FsUnit/pull/89
+
+### 2.0.0 - February 8, 2016
+* Added support of `NUnit 3` - https://github.com/fsprojects/FsUnit/pull/83
+* Dropped support of obsolete `not` operator
+
+### 1.4.1.0 - 07 December 2015
+* Fixed `should be null` - https://github.com/fsprojects/FsUnit/issues/52
+
+### 1.4.0.0 - 03 November 2015
+* Migration to xUnit 2.1
 * FsUnit.NUnit compiled for net45
 * Target FsUnit to FSharp.Core 3.1.2.5
 * FsUnitDepricated module renamed to FsUnitDeprecated https://github.com/fsprojects/FsUnit/pull/46
